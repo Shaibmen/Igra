@@ -1,9 +1,11 @@
+import random
+
 #создать классы
 class_personaz = {
-    "Крестьянин": {"Здоровье": 522, "Урон": 112, "Защита": 15, "Выносливость": 100},
-    "Заключённый": {"Здоровье": 455, "Урон": 109, "Защита": 10, "Выносливость": 80},
-    "Пророк": {"Здоровье": 500, "Урон": 20, "Защита": 5, "Выносливость": 70},
-    "Наёмник": {"Здоровье": 490, "Урон": 130, "Защита": 12, "Выносливость": 110},
+    "Крестьянин": {"Здоровье": 522, "Урон": 112, "Защита": 15},
+    "Заключённый": {"Здоровье": 455, "Урон": 109, "Защита": 10},
+    "Пророк": {"Здоровье": 500, "Урон": 20, "Защита": 5},
+    "Наёмник": {"Здоровье": 490, "Урон": 130, "Защита": 12},
 }
 
 player = {
@@ -12,22 +14,98 @@ player = {
     "Здоровье": "",
     "Урон": "",
     "Защита": "",
-    "Способность": "",
-    "Инвентарь": [],
-    "Кошелёк": "",
+    "Кошелёк": 0,
+}
+player_Inventory = []
+global mobs_kill
+mobs_kill = 0
+
+#создать енеми и боссов и их генерацию
+enemy = {
+    "Страж леса": {"Здоровье": 200, "Урон": 50, "Защита": 65}
 }
 
+boss = {
+    "Столп Мироздания": {"Здоровье": 600, "Урон": 200, "Защита": 50},
+    "Малликет - бог смерти": {"Здоровье": 500, "Урон": 350, "Защита": 12},
+    "Секиро": {"Здоровье": 400, "Урон": 400, "Защита": 10},
+}
+
+#создать разброс урона
+def damage():
+    damage_min_player = player["Урон"] - 10
+    damage_max_player = player["Урон"] + 10
+    player["Урон"] = random.randint(damage_min_player, damage_max_player)
+    return player["Урон"]
+
+#создать награду
+def reward():
+    money = random.randint(145, 200)
+    return money
+
+#уклонение
+def yklon():
+    itog = random.randint(1,2)
+    return itog
+
+#создать режим боя
+def fight_enemy():
+    print("Вы слышите в кустах какой то звук, на вас накидывается какое - то существо, похоже сейчас будет бой!")
+    if mobs_kill == 3:
+        enemy_unit = boss["Секиро"]
+    else:
+       enemy_unit = enemy["Страж леса"]
+    if mobs_kill == 6:
+        enemy_unit = boss["Малликет - бог смерти"]
+    else:
+        enemy_unit = enemy["Страж леса"]
+    if mobs_kill == 9:
+        enemy_unit = boss["Столп Мироздания"]
+    else:
+       enemy_unit = enemy["Страж леса"]
+    if mobs_kill < 3:
+        enemy_unit = enemy["Страж леса"]
+    
+    enemy_unit["Здоровье"] = 200
+
+    while player["Здоровье"] > 0 and enemy_unit["Здоровье"] > 0:
+        reward_enemy = reward()
+        player_damage = damage()
+        print("Ваше здоровье:", player["Здоровье"])
+        print("Здоровье врага:", enemy_unit["Здоровье"])
+        print("Выбирите действие:\n1.Атаковать\n2.Уклониться\n3.Сбежать")
+        
+        choise_fight = int(input())
+        if choise_fight == 1:
+            enemy_unit["Здоровье"] = enemy_unit["Здоровье"] - player_damage
+            player["Здоровье"] = player["Здоровье"] - enemy_unit["Урон"]
+            if enemy_unit["Здоровье"] < 0:
+                print("Монстр повержен!\nВы получили:", reward_enemy,"золотых")
+                player["Кошелёк"] = player["Кошелёк"] + reward_enemy
+                market()
+
+        if choise_fight == 2:
+            ykloniksa = yklon()
+            if ykloniksa == 1:
+                print("Вы успешно уклонились!")
+            else:
+                print("произошёл анлак...))")
+                player["Здоровье"] = player["Здоровье"] - enemy_unit["Урон"]
+
+        if choise_fight == 3:
+            print("Вы сбежали с поля брани, вы поступили как трус, хоть того и требовала ситуация")
+            market()       
 
 #присваивание выбранных атрибутов игроку
-# damage_player = class_personaz["Govno"]["Урон"] ----- обрашение к атрибутам словаря
+# damage_player = class_personaz["..."]["Урон"] ----- обрашение к атрибутам словаря
 
 def startStats_player():
 
     name_player = str(input())
 
     print("Выберите желаемый класс:")
-    print("1. Крестьянин: Здоровье - 522, Урон - 112, Защита - 15, Выносливость - 100\n2. Заключённый: Здоровье - 455, Урон - 109, Защита - 10, Выносливость - 80 ")
-    print("3. Пророк: Здоровье - 500, Урон - 20, Защита - 5, Выносливость - 70\n4. Наёмник: Здоровье - 490, Урон - 130, Защита - 12, Выносливость - 110 ")
+    print("1. Крестьянин: Здоровье - 522, Урон - 112, Защита - 15, Выносливость - 100\n2. Заключённый: Здоровье - 455, Урон - 109, Защита - 10")
+    print("3. Пророк: Здоровье - 500, Урон - 20, Защита - 5, Выносливость - 70\n4. Наёмник: Здоровье - 490, Урон - 130, Защита - 12")
     choise_class = int(input())
 
     if choise_class == 1:
@@ -36,7 +114,6 @@ def startStats_player():
         player["Здоровье"] = class_personaz["Крестьянин"]["Здоровье"]
         player["Урон"] = class_personaz["Крестьянин"]["Урон"]
         player["Защита"] = class_personaz["Крестьянин"]["Защита"]
-        player["Выносливость"] = class_personaz["Крестьянин"]["Выносливость"]
         
 
     if choise_class == 2:
@@ -45,15 +122,12 @@ def startStats_player():
         player["Здоровье"] = class_personaz["Заключённый"]["Здоровье"]
         player["Урон"] = class_personaz["Заключённый"]["Урон"]
         player["Защита"] = class_personaz["Заключённый"]["Защита"]
-        player["Выносливость"] = class_personaz["Заключённый"]["Выносливость"]    
-
     if choise_class == 3:
         player["Имя"] = name_player
         player["Класс"] = "Пророк"
         player["Здоровье"] = class_personaz["Пророк"]["Здоровье"]
         player["Урон"] = class_personaz["Пророк"]["Урон"]
         player["Защита"] = class_personaz["Пророк"]["Защита"]
-        player["Выносливость"] = class_personaz["Пророк"]["Выносливость"]
 
     if choise_class == 4:
         player["Имя"] = name_player
@@ -61,7 +135,143 @@ def startStats_player():
         player["Здоровье"] = class_personaz["Наёмник"]["Здоровье"]
         player["Урон"] = class_personaz["Наёмник"]["Урон"]
         player["Защита"] = class_personaz["Наёмник"]["Защита"]
-        player["Выносливость"] = class_personaz["Наёмник"]["Выносливость"]
+
+    if choise_class > 4 or choise_class < 1:
+        print("неверное число! Попробуйте ещё раз")
+        print("Введите имя:")
+        startStats_player()
+
+#создать меню с отображением характеристик
+def stats():
+    print("Статы:")
+    print(player)
+    print("Ваш инвентарь:")
+    print(player_Inventory)
+    print(f"Убито монстров: {mobs_kill}")
+    # print(mobs_kill)
+    print("Для выхода введите \"0\"")
+    exit_stats = int(input())
+    if exit_stats == 0:
+        market()
+
+
+#создание рынка
+def market():
+    print("Вы приходите на рынок, тут достаточно оживлёно, впрочем как и всегда.\nЧто вы желаете сделать?:")
+    print("1.Купить оружие\n2.Купить броню\n3.Взять задание\n4.Посмотреть характеристики")
+    choise_market = int(input())
+    if choise_market == 1:
+        print("Вы приходите в оружейную лавку, перед вами стоит кузнец и предлагает свой арсенал:")
+        # dictionary = {1:"1.Двухперстная печать - 500 золотых.", 2:"2.Клинок алой крови - 1200 золотых.", 3:"3.Воровские клинки - 850 золотых.", 4:"4.Копьё - 450 золотых.", 5:"Цвайхандер - 1500 золотых"}
+        print("1.Двухперстная печать - 500 золотых.\n2.Клинок алой крови - 1200 золотых.\n3.Воровские клинки - 850 золотых.\n4.Копьё - 450 золотых.\n5.Цвайхандер - 1500 золотых")
+        print("Для выхода введите \"0\"")
+        IsDone = True
+        while (IsDone != False):
+            choise_weapon = int(input())
+            if choise_weapon == 1:
+                if player["Кошелёк"] > 500:
+                    player["Кошелёк"] = player["Кошелёк"] - 500
+                    player_Inventory.append("Двухперстная печать")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 2:
+                if player["Кошелёк"] > 1200:
+                    player["Кошелёк"] = player["Кошелёк"] - 1200
+                    player_Inventory.append("Клинок алой крови")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 3:
+                if player["Кошелёк"] > 850:
+                    player["Кошелёк"] = player["Кошелёк"] - 850
+                    player_Inventory.append("Воровские клинки")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 4:
+                if player["Кошелёк"] > 450:
+                    player["Кошелёк"] = player["Кошелёк"] - 450
+                    player_Inventory.append("Копьё")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 5:
+                if player["Кошелёк"] > 1500:
+                    player["Кошелёк"] = player["Кошелёк"] - 1500
+                    player_Inventory.append("Цвайхандер")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 0:
+                IsDone = False
+                market()
+
+    if choise_market == 2:
+        bronya = ["1.Кожанка - 1500 золотых.", "2.Латные доспехи - 2000 золотых.", "3.Мантия чудотворца - 800 золотых.", "4.Снаряжение рыбака - 600 золотых.", "5.Доспех Легионера - 2500 золотых."]
+        print("Вы приходите на рынок, перед вами раскинулись многочисленные палатки, сдешние торговцы уже заждались покупателей. Вы подходите к первому торговцу с бронёй:")
+        bronya_redach = " | ".join(bronya)
+        print(bronya_redach)
+        # print("1.Кожанка - 1500 золотых.\n2.Латные доспехи - 2000 золотых.\n3.Мантия чудотворца - 800 золотых.\n4.Снаряжение рыбака - 600 золотых.\n5.Доспех Легионера - 2500 золотых")
+        print("Для выхода введите \"0\"")
+        IsDone = True
+        while (IsDone != False):
+            choise_weapon = int(input())
+            if choise_weapon == 1:
+                if player["Кошелёк"] > 1500:
+                    player["Кошелёк"] = player["Кошелёк"] - 500
+                    player_Inventory.append("Кожанка")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 2:
+                if player["Кошелёк"] > 2000:
+                    player["Кошелёк"] = player["Кошелёк"] - 2000
+                    player_Inventory.append("Латные доспехи")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 3:
+                if player["Кошелёк"] > 800:
+                    player["Кошелёк"] = player["Кошелёк"] - 800
+                    player_Inventory.append("Мантия чудотворца")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 4:
+                if player["Кошелёк"] > 600:
+                    player["Кошелёк"] = player["Кошелёк"] - 450
+                    player_Inventory.append("Снаряжение рыбака")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 5:
+                if player["Кошелёк"] > 2500:
+                    player["Кошелёк"] = player["Кошелёк"] - 2500
+                    player_Inventory.append("Доспех Легионера")
+                    IsDone = False
+                else:
+                    print("У вас не хватает золотых!")
+
+            if choise_weapon == 0:
+                IsDone = False
+                market()    
+
+    if choise_market == 3:
+        print("В лесу стали пропадать люди из нашего города, пойди туда и разберись")   
+        fight_enemy()  
+
+    if choise_market == 4:
+        stats()
 
 #История.
 print("Был вечер и было утро, день ото дня, и так неизменно. Существовали народы и королевства. \nВсе они подчинялсь единой власти, бессмертный правитель, ужаснейший в своём роде - Гёбу Онива! ")
@@ -84,5 +294,11 @@ print("-------------------------------------------------------------------------
 print("Приветсвую, путник! Я страж городских ворот Эворт! Представься, а то не пропущу!")
 startStats_player()
 print("Ну здравствуй", player["Имя"],", говоришь ты", player["Класс"],"?")
+print(" ")
 print("Говорят можно найти работёнку на рынке. Твои способности там оценят по достоинству")
-
+print(" ")
+while True:
+    try:
+        market()
+    except:
+        print("Введённое значение не верно, будь внимательней!")
